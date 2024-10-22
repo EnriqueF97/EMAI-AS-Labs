@@ -1,0 +1,3 @@
+El ambiente virtual se llama AS-lab1
+Para crearlo python -m venv AS-lab1
+Para activarlo se usa AS-lab1/Scripts/Activate.ps1 
