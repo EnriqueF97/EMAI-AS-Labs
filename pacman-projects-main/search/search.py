@@ -133,14 +133,74 @@ def depth_first_search(problem):
     print("Start's successors:", problem.get_successors(problem.get_start_state()))
     """
     "*** YOUR CODE HERE ***"
-    util.raise_not_defined()
+    # i = 0
+    expanded_nodes = [] # Expanded nodes initialized as an empty list
+    frontier = util.Stack()
+    frontier.push((problem.get_start_state(),[]))  # Frontier initialized with the initial state
+
+    # while i < 10:
+        # i+=1
+    while True:
+        # print("iteración ", i)
+        if not frontier:  # If the frontier is empty, return failure
+            return "Failure"
+        # print("Frontier: ", frontier)
+        n, path = frontier.pop() # acess the last element of this list
+        # print("Poped: ", n)
+        # print("path", path)
+        expanded_nodes.append(n) # appends n to the end of the list (LIFO)
+
+        if problem.is_goal_state(n):  # If n is a goal state, return the solution
+            return path  # (Here, you'd return the actual solution path)
+        
+        # print("Succesors:  ", problem.get_successors(n) )
+        for m in problem.get_successors(n):  # For each child m of n (expanding n)    
+            child_state = m[0]  # Get the state of the child
+            # print("child state: ", m[0])     
+            action = m[1]
+            if not frontier.contains(child_state) and child_state not in expanded_nodes:
+                new_path = path + [action]
+                frontier.push((child_state,new_path))  # appends n to the frontier (LIFO)
+
+        # print("Expanded",expanded_nodes)      
+    # util.raise_not_defined()
 
 
 
 def breadth_first_search(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    util.raise_not_defined()
+     # i = 0
+    expanded_nodes = [] # Expanded nodes initialized as an empty list
+    frontier = util.Queue() 
+    frontier.push((problem.get_start_state(),[]))  # Frontier initialized with the initial state
+
+    # while i < 10:
+        # i+=1
+    while True:
+        # print("iteración ", i)
+        if not frontier:  # If the frontier is empty, return failure
+            return "Failure"
+        # print("Frontier: ", frontier)
+        n, path = frontier.pop() # acess the first element of this list (FIFO)
+        # print("Poped: ", n)
+        # print("path", path)
+        expanded_nodes.append(n) # 
+
+        if problem.is_goal_state(n):  # If n is a goal state, return the solution
+            return path  # (Here, you'd return the actual solution path)
+        
+        # print("Succesors:  ", problem.get_successors(n) )
+        for m in problem.get_successors(n):  # For each child m of n (expanding n)    
+            child_state = m[0]  # Get the state of the child
+            # print("child state: ", m[0])     
+            action = m[1]
+            if not frontier.contains(child_state) and child_state not in expanded_nodes:
+                new_path = path + [action]
+                frontier.push((child_state,new_path))  # push to the frontier (FIFO)
+
+        # print("Expanded",expanded_nodes)      
+    # util.raise_not_defined()
 
 def uniform_cost_search(problem):
     """Search the node of least total cost first."""
@@ -164,3 +224,6 @@ bfs = breadth_first_search
 dfs = depth_first_search
 astar = a_star_search
 ucs = uniform_cost_search
+
+
+

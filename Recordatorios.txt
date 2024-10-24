@@ -1,0 +1,10 @@
+
+El ambiente virtual se llama PacManEnv
+Para crearlo virtualenv -p python3.8 PacManEnv
+Para activarlo se usa PacManEnv\Scripts\activate en la carpeta AS2024
+
+El repo se llama AS-Lab1.
+
+SEARCH
+
+Link1: https://github.com/aig-upf/pacman-projects/blob/main/search/README.md
