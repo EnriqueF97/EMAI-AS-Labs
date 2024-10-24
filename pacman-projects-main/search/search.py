@@ -158,7 +158,8 @@ def depth_first_search(problem):
             child_state = m[0]  # Get the state of the child
             # print("child state: ", m[0])     
             action = m[1]
-            if not frontier.contains(child_state) and child_state not in expanded_nodes:
+            # if not frontier.contains(child_state) and child_state not in expanded_nodes:
+            if child_state not in expanded_nodes:
                 new_path = path + [action]
                 frontier.push((child_state,new_path))  # appends n to the frontier (LIFO)
 
@@ -195,7 +196,7 @@ def breadth_first_search(problem):
             child_state = m[0]  # Get the state of the child
             # print("child state: ", m[0])     
             action = m[1]
-            if not frontier.contains(child_state) and child_state not in expanded_nodes:
+            if child_state not in expanded_nodes:
                 new_path = path + [action]
                 frontier.push((child_state,new_path))  # push to the frontier (FIFO)
 
@@ -204,8 +205,37 @@ def breadth_first_search(problem):
 
 def uniform_cost_search(problem):
     """Search the node of least total cost first."""
-    "*** YOUR CODE HERE ***"
-    util.raise_not_defined()
+    
+     # i = 0
+    expanded_nodes = [] # Expanded nodes initialized as an empty list
+    frontier = util.PriorityQueue() 
+    frontier.push((problem.get_start_state(),[]),0)  # Frontier initialized with the initial state
+
+    # while i < 10:
+        # i+=1
+    while True:
+        # print("iteración ", i)
+        if not frontier:  # If the frontier is empty, return failure
+            return "Failure"
+        # print("Frontier: ", frontier)
+        n, path = frontier.pop() # acess the first element of this list (FIFO)
+        # print("Poped: ", n)
+        # print("path", path)
+        expanded_nodes.append(n) # 
+
+        if problem.is_goal_state(n):  # If n is a goal state, return the solution
+            return path  # (Here, you'd return the actual solution path)       
+        # print("Succesors:  ", problem.get_successors(n) )
+        for m in problem.get_successors(n):  # For each child m of n (expanding n)    
+            child_state = m[0]  # Get the state of the child
+            # print("child state: ", m[0])     
+            action = m[1]
+            if child_state not in expanded_nodes:
+                new_path = path + [action]
+                ev_function = problem.get_cost_of_actions(new_path)
+                frontier.push((child_state,new_path),ev_function)  # push to the frontier (FIFO)
+        # print("Expanded",expanded_nodes) 
+    # util.raise_not_defined()
 
 def null_heuristic(state, problem=None):
     """
@@ -217,7 +247,36 @@ def null_heuristic(state, problem=None):
 def a_star_search(problem, heuristic=null_heuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raise_not_defined()
+      # i = 0
+    expanded_nodes = [] # Expanded nodes initialized as an empty list
+    frontier = util.PriorityQueue() 
+    frontier.push((problem.get_start_state(),[]),0)  # Frontier initialized with the initial state
+
+    # while i < 10:
+        # i+=1
+    while True:
+        # print("iteración ", i)
+        if not frontier:  # If the frontier is empty, return failure
+            return "Failure"
+        # print("Frontier: ", frontier)
+        n, path = frontier.pop() # acess the first element of this list (FIFO)
+        # print("Poped: ", n)
+        # print("path", path)
+        expanded_nodes.append(n) # 
+
+        if problem.is_goal_state(n):  # If n is a goal state, return the solution
+            return path  # (Here, you'd return the actual solution path)       
+        # print("Succesors:  ", problem.get_successors(n) )
+        for m in problem.get_successors(n):  # For each child m of n (expanding n)    
+            child_state = m[0]  # Get the state of the child
+            # print("child state: ", m[0])     
+            action = m[1]
+            if child_state not in expanded_nodes:
+                new_path = path + [action]
+                ev_function = problem.get_cost_of_actions(new_path) + heuristic(child_state,problem)
+                frontier.push((child_state,new_path),ev_function)  # push to the frontier (FIFO)
+        # print("Expanded",expanded_nodes) 
+    # util.raise_not_defined()
 
 # Abbreviations
 bfs = breadth_first_search
