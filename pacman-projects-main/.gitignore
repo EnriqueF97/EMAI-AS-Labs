@@ -1,3 +1,6 @@
 __pycache__/
 .idea/
 venv/
+search/__pycache__
+/venv
+../.python-version
