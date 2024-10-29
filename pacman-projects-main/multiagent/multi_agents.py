@@ -71,10 +71,65 @@ class ReflexAgent(Agent):
         new_pos = successor_game_state.get_pacman_position()
         new_food = successor_game_state.get_food()
         new_ghost_states = successor_game_state.get_ghost_states()
+        new_ghost_positions = successor_game_state.get_ghost_positions()
         new_scared_times = [ghostState.scared_timer for ghostState in new_ghost_states]
-        
         "*** YOUR CODE HERE ***"
-        return successor_game_state.get_score()
+
+        # FOOD DISTANCE EVALUATION
+        # Convert the food grid to a list of food positions
+        food_list = new_food.as_list()    
+        if food_list: # Check if there is any food in the list
+            distances = []
+            for food in food_list:
+                distance = manhattan_distance(new_pos, food)
+                distances.append(distance)
+            min_food_distance = min(distances)  # Find the minimum distance in the list of distances
+        else:
+            min_food_distance = 1 # If there is no food, set the distance to 1
+                
+    
+        # Create a list to store distance to ghosts
+        ghost_distances = []
+
+        for ghost in new_ghost_states:
+            ghost_position = ghost.get_position()            
+            distance = manhattan_distance(new_pos, ghost_position)
+            ghost_distances.append(distance)
+
+        
+        #Separate between active and scared
+        
+            scared_ghosts = []
+            active_ghosts = []
+
+        # Loop through each ghost's scared time and distance
+        for i, time in enumerate(new_scared_times):
+            # Check if the ghost is scared (scared time > 0)
+            if time > 0:
+                scared_ghosts.append(ghost_distances[i])
+
+            if time == 0:
+                active_ghosts.append(ghost_distances[i])
+
+        
+        #Penalty for active ghosts
+        active_ghosts_penalty = 0
+        if active_ghosts:
+            min_active_ghost_distance = min(active_ghosts)
+            active_ghosts_penalty = -100/(min_active_ghost_distance + 1)
+        # Reward Pacman for chasing scared ghosts
+        scared_ghost_reward = 0
+        if scared_ghosts:
+            min_scared_ghost_distance = min(scared_ghosts)
+            scared_ghost_reward = 200 / (min_scared_ghost_distance + 1)  # Reward for approaching scared ghosts
+
+        score =  successor_game_state.get_score() \
+                 + (10 / min_food_distance) \
+                    - len(food_list) * 100  \
+                    + active_ghosts_penalty \
+                    + scared_ghost_reward
+        
+        return score
 
 def score_evaluation_function(current_game_state):
     """
