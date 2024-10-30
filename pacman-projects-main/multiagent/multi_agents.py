@@ -156,7 +156,7 @@ class MultiAgentSearchAgent(Agent):
 
     def __init__(self, eval_fn='score_evaluation_function', depth='2'):
         super().__init__()
-        self.index = 0 # Pacman is always agent index 0
+        self.index = 0
         self.evaluation_function = util.lookup(eval_fn, globals())
         self.depth = int(depth) 
 
@@ -210,56 +210,53 @@ class MinimaxAgent(MultiAgentSearchAgent):
     
     """ This is the minimax function what will be used for the max and min turns """
     def minimax(self, game_state, depth, agent_index):
-        # Check if we have reached the maximum depth or we won or lose via the game state
+        # When we reach maximum depth or we won or lose via the game state, end game by returning the eval function of the current game state
         if depth == self.depth or game_state.is_win() or game_state.is_lose():
             return self.evaluation_function(game_state)
 
         if agent_index == 0: # Pacman agent turn (maximizing player)
             return self.max_value(game_state, depth, agent_index)
+        
         else: # Ghost agent turn (minimizing players)
             return self.min_value(game_state, depth, agent_index)
     
     """ This is the max player (Pacman) minimax function, returns the max value of a given game state that goes to a specified depth """
     def max_value(self, game_state, depth, agent_index):
+        
         max_value = float('-inf')  # Initialize value to negative infinity
-
-        pacman_legal_actions = game_state.get_legal_actions(agent_index) # Get legal actions for Pacman
+        pacman_legal_actions = game_state.get_legal_actions(agent_index) # Get all  legal actions for Pacman
 
         if not pacman_legal_actions:
-            return self.evaluation_function(game_state) # If no legal actions, return the evaluation of the current state
+
+            return self.evaluation_function(game_state) # If there are no legal actions, we return the evaluation of the current sate
 
         for action in pacman_legal_actions:
             successor_state = game_state.generate_successor(agent_index, action) # Generate successor state
             
-            next_agent = agent_index + 1 # Next agent index (ghosts)
-            
-            score = self.minimax(successor_state, depth, next_agent % game_state.get_num_agents()) # Recursively call minimax for the next agent
-            
-            max_value = max(max_value, score) # Update the value with the maximum score
+            next_agent_id = agent_index + 1 # Next agent index (ghosts)
+            score = self.minimax(successor_state, depth, next_agent_id % game_state.get_num_agents()) # recursively execute minimax for the next agent
+            max_value = max(max_value, score) # Udpate the value with the maximum score
 
         return max_value
     
     """ This is the min player (Ghosts) turn function, returns the max value of a given game state that goes to a specified depth """
     def min_value(self, game_state, depth, agent_index):
         min_value = float('inf')  # Initialize value to positive infinity
-
         legal_actions = game_state.get_legal_actions(agent_index) # Get legal actions for the ghost agent
 
         if not legal_actions:
-            # Return the evaluation of the current state
-            return self.evaluation_function(game_state)
+            return self.evaluation_function(game_state)# return the evaluation of the current state
 
         for action in legal_actions:
-            successor_state = game_state.generate_successor(agent_index, action) # Generate successor state
-            
-            next_agent = agent_index + 1 
+            successor_state = game_state.generate_successor(agent_index, action) #Generate successor state
+
+            next_agent = agent_index + 1 #change agnet id 
             num_agents = game_state.get_num_agents()
 
-            if next_agent % num_agents == 0:
-                score = self.minimax(successor_state, depth + 1, 0) # Increase depth, it's Pacmans turn again
+            if next_agent % num_agents == 0: # when modulus is 0, means all agents have been visited, thus going to a deeper level and starting again with agent 0
+                score = self.minimax(successor_state, depth+1, 0) # Increase depth, it's Pacmans turn again
             else:
-                score = self.minimax(successor_state, depth, next_agent % num_agents) # Continue to next ghost
-            
+                score = self.minimax(successor_state, depth, next_agent%num_agents) # Continue to next ghost
             min_value = min(min_value, score) # Update the value with the minimum score
 
         return min_value
@@ -281,21 +278,21 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         best_value = float('-inf')  
         best_action = None  
 
-        legal_actions = game_state.get_legal_actions(0) # Get list of legal actions for Pacman (agent index 0)
+        legal_actions = game_state.get_legal_actions(0) # Get the list of legal actions for Pacman (agent index 0)
         
-        for action in legal_actions: # Iterate over all legal actions to find the best one
-            successor_state = game_state.generate_successor(0, action) # Generate the successor state after Pacman takes the action
+        for action in legal_actions: # Iterate over allthe legal actions to find the best one
+            successor_state = game_state.generate_successor(0,action) # generate the successor state after Pacman takes the action
             
             #This is the first call of alphabeta, so we are at a max turn, calling a min turn
-            value = self.alphabeta(successor_state, 0, 1,alpha,beta )
+            value = self.alphabeta(successor_state, 0, 1,alpha, beta )
 
-            if value > best_value: # Update best score and action if a better score is found
+            if value > best_value: #Update best score and action if a better score is found
                 best_value = value
-                best_action = action # We save the best action of alpha beta
+                best_action = action #We save the best action of alpha beta
 
-            alpha = max(alpha, best_value) # Update alpha
+            alpha = max(alpha, best_value) #Update alpha
 
-        # Return the action with the highest alphabeta value
+        #Return the action with the highest alphabeta value
         return best_action
     
     """ This is the alphabeta function what will be used for the max and min turns """
@@ -311,24 +308,24 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
     
     """ This is the max player (Pacman) alphabeta function, returns the max value of a given game state that goes to a specified depth """
     def max_value(self, game_state, depth, agent_index, alpha, beta):
-        max_value = float('-inf')  # Initialize value to negative infinity
+        max_value = float('-inf')  #Initialize value to negative infinity
 
         pacman_legal_actions = game_state.get_legal_actions(agent_index) # Get legal actions for Pacman
 
         if not pacman_legal_actions:
-            return self.evaluation_function(game_state) # If no legal actions, return the evaluation of the current state
+            return self.evaluation_function(game_state) # iff no legal actions, return the evaluation of the current state
 
         for action in pacman_legal_actions:
-            successor_state = game_state.generate_successor(agent_index, action) # Generate successor state
+            successor_state = game_state.generate_successor(agent_index, action) #generate successor state
             
             next_agent = agent_index + 1 # Next agent index (ghosts)
             
-            value = self.alphabeta(successor_state, depth, next_agent,alpha,beta) # Recursively call alphabeta for the next agent, returns a value for that branc
+            value = self.alphabeta(successor_state, depth, next_agent,alpha,beta) #Recursively call alphabeta for the next agent, returns a value for that branc
             
             max_value = max(value, max_value) #update max
 
             if max_value > beta: #Prunning
-                return max_value #We return before the for cicle is over, then we are not exploring all the legal acctions of PacMan
+                return max_value # We return before the for cicle is over, then we are not exploring all the legal acctions of PacMan
             alpha = max(alpha,max_value) #update Alpha
             
         return max_value
