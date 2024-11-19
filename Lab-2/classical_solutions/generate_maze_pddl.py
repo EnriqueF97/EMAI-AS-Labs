@@ -24,15 +24,15 @@ def generate_pddl_from_maze(maze, start, goal):
     # Define agent start and goal positions
     start_x, start_y = start
     goal_x, goal_y = goal
-    start_position = f"(at joseph {x_positions[start_x]} {y_positions[start_y]})"
-    goal_position = f"(at joseph {x_positions[goal_x]} {y_positions[goal_y]})"
+    start_position = f"(at {x_positions[start_x]} {y_positions[start_y]})"
+    goal_position = f"(at {x_positions[goal_x]} {y_positions[goal_y]})"
 
     # Create PDDL structure
     pddl = f"""
 (define (problem maze-problem)
   (:domain maze)
   
-  (:objects {" ".join(x_positions)} {" ".join(y_positions)} - position joseph - agent)
+  (:objects {" ".join(x_positions)} {" ".join(y_positions)} - position)
   
   (:init
     ; Define increment (inc) and decrement (dec) relationships

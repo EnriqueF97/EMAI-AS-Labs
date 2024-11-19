@@ -1,8 +1,7 @@
 (define (problem p1)
   (:domain maze)
 
-  
-  (:objects x1 x2 x3 x4 x5 x6 y1 y2 y3 y4 y5 y6 - position joseph - agent)  ; Use `c`-prefixed symbols for positions
+  (:objects x1 x2 x3 x4 x5 x6 y1 y2 y3 y4 y5 y6 - coordinate)  ; Use `c`-prefixed symbols for positions
 
   (:init
     ; Define increment (inc) and decrement (dec) relationships
@@ -15,7 +14,7 @@
     (wall x5 y4)
     (wall x2 y5) (wall x3 y5) (wall x4 y5)
 
-    (at joseph x1 y1))
+    (at x1 y1))
   (:goal
-    (at joseph x3 y4))
+    (at x3 y4))
 )
