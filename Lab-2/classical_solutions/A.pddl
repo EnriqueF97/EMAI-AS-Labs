@@ -1,5 +1,5 @@
 (define (problem maze-A)
-  (:domain maze)
+  (:domain maze-key)
 
   (:objects x1 x2 x3 x4 x5 y1 y2 y3 y4 y5 - coordinate ag - agent)
 
