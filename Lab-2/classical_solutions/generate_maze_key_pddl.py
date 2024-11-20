@@ -19,9 +19,9 @@ def generate_pddl_from_maze(maze, start, goal, problem_name):
     # Identify walls, keys, and doors
     walls = []
     keys = []
-    doors = []
     key_at = []
     door_at = []
+    door_locked = []
     key_unlocks = []
     for y, row in enumerate(maze):
         for x, cell in enumerate(row):
@@ -29,22 +29,30 @@ def generate_pddl_from_maze(maze, start, goal, problem_name):
                 walls.append(f"(obstacle {x_coord[x]} {y_coord[y]})")
             elif cell.islower():  # Keys (lowercase letters)
                 key_symbol = f"k{cell}"
-                keys.append(key_symbol)
+                if key_symbol not in keys:
+                    keys.append(key_symbol)
                 key_at.append(
                     f"(key-at {key_symbol} {x_coord[x]} {y_coord[y]})")
             elif cell.isupper():  # Doors (uppercase letters)
-                door_symbol = f"d{cell.lower()}"
-                doors.append(door_symbol)
-                door_at.append(
-                    f"(door-at {door_symbol} {x_coord[x]} {y_coord[y]})")
+                door_x = x_coord[x]
+                door_y = y_coord[y]
+                door_at.append(f"(door-at {door_x} {door_y})")
+                door_locked.append(f"(door-locked {door_x} {door_y})")
                 # Automatically create key-door relationship
+                key_char = cell.lower()
+                key_symbol = f"k{key_char}"
+                if key_symbol not in keys:
+                    keys.append(key_symbol)
+                    # Note: Key may not be present in the maze
                 key_unlocks.append(
-                    f"(key-unlocks k{cell.lower()} {door_symbol})")
+                    f"(key-unlocks {key_symbol} {door_x} {door_y})")
 
     # Prepare strings for the PDDL sections
     walls_str = " ".join(walls)
-    key_at_str = " ".join(key_at) if keys else "; Keys"
-    door_at_str = " ".join(door_at) if doors else "; Doors"
+    key_at_str = " ".join(key_at) if key_at else "; Keys"
+    door_at_str = " ".join(door_at) if door_at else "; Doors"
+    door_locked_str = " ".join(
+        door_locked) if door_locked else "; Doors are unlocked"
     key_unlocks_str = " ".join(
         key_unlocks) if key_unlocks else "; Key-Door Relationships"
 
@@ -57,9 +65,9 @@ def generate_pddl_from_maze(maze, start, goal, problem_name):
     # Create PDDL structure
     pddl = f"""
 (define (problem maze-{problem_name})
-  (:domain maze)
+  (:domain maze-key)
 
-  (:objects {" ".join(x_coord)} {" ".join(y_coord)} - coordinate ag - agent {" ".join(keys)} - key {" ".join(doors)} - door)
+  (:objects {" ".join(x_coord)} {" ".join(y_coord)} - coordinate ag - agent {" ".join(keys)} - key)
 
   (:init
     ; Adjacency definition
@@ -76,6 +84,7 @@ def generate_pddl_from_maze(maze, start, goal, problem_name):
 
     ; Doors
     {door_at_str}
+    {door_locked_str}
 
     ; Key-Door Relationships
     {key_unlocks_str}

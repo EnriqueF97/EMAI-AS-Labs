@@ -1,7 +1,9 @@
 (define (problem maze-G)
-  (:domain maze)
+  (:domain maze-key)
 
-  (:objects x1 x2 x3 x4 y1 y2 y3 y4 - coordinate ag - agent ka - key da - door)
+  (:objects x1 x2 x3 x4 y1 y2 y3 y4 - coordinate
+            ag - agent
+            ka - key)
 
   (:init
     ; Adjacency definition
@@ -10,17 +12,18 @@
     (dec x2 x1) (dec x3 x2) (dec x4 x3)
     (dec y2 y1) (dec y3 y2) (dec y4 y3)
 
-    ; obstacles
+    ; Obstacles
     (obstacle x3 y1) (obstacle x3 y2) (obstacle x2 y3) (obstacle x3 y3)
 
     ; Keys
     (key-at ka x4 y1)
 
-    ; Doors
-    (door-at da x1 y3)
+    ; Doors (represented by their coordinates)
+    (door-at x1 y3)
+    (door-locked x1 y3)
 
-    ; Key-Door Relationships
-    (key-unlocks ka da)
+    ; Key-Door Relationships (keys unlock doors at specific coordinates)
+    (key-unlocks ka x1 y3)
 
     ; Initial position
     (at ag x4 y4)
