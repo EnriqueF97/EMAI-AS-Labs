@@ -8,7 +8,6 @@
     (at ?a - agent ?x ?y - coordinate)
     (obstacle ?x ?y - coordinate)
     (door-at ?x ?y - coordinate)
-    (door-locked ?x ?y - coordinate)
     (key-at ?k - key ?x ?y - coordinate)
     (have-key ?k - key)
     (has-key)                          ; Agent is holding a key
@@ -16,7 +15,7 @@
   )
 
   ; Action to pick up a key
-  (:action pickup-key
+  (:action pickup
     :parameters (?a - agent ?k - key ?x ?y - coordinate)
     :precondition (and
       (at ?a ?x ?y)
@@ -31,7 +30,7 @@
   )
 
   ; Action to unlock a door
-  (:action unlock-door
+  (:action unlock
     :parameters (?a - agent ?k - key ?x ?y ?xd ?yd - coordinate)
     :precondition (and
       (at ?a ?x ?y)
@@ -39,7 +38,6 @@
       (has-key)
       (key-unlocks ?k ?xd ?yd)
       (door-at ?xd ?yd)
-      (door-locked ?xd ?yd)
       (or
         (and (dec ?x ?xd) (= ?y ?yd))
         (and (inc ?x ?xd) (= ?y ?yd))
@@ -48,15 +46,13 @@
       )
     )
     :effect (and
-      (not (door-locked ?xd ?yd))
+      (not (door-at ?xd ?yd))
       (not (have-key ?k))
       (not (has-key))                  ; Agent no longer has a key
     )
   )
 
   ; Move actions without doors
-
-
   (:action up
       :parameters ()
       :precondition (and 
@@ -76,20 +72,6 @@
             )
   )
   
-  ; (:action move-up
-  ;   :parameters (?a - agent ?x ?y ?yn - coordinate)
-  ;   :precondition (and
-  ;     (at ?a ?x ?y)
-  ;     (dec ?y ?yn)
-  ;     (not (obstacle ?x ?yn))
-  ;     (not (door-at ?x ?yn))
-  ;   )
-  ;   :effect (and
-  ;     (not (at ?a ?x ?y))
-  ;     (at ?a ?x ?yn)
-  ;   )
-  ; )
-
     (:action down
       :parameters ()
       :precondition (and 
@@ -108,20 +90,6 @@
               ))
             )
   )
-
-  ; (:action move-down
-  ;   :parameters (?a - agent ?x ?y ?yn - coordinate)
-  ;   :precondition (and
-  ;     (at ?a ?x ?y)
-  ;     (inc ?y ?yn)
-  ;     (not (obstacle ?x ?yn))
-  ;     (not (door-at ?x ?yn))
-  ;   )
-  ;   :effect (and
-  ;     (not (at ?a ?x ?y))
-  ;     (at ?a ?x ?yn)
-  ;   )
-  ; )
 
     (:action left
       :parameters ()
@@ -142,21 +110,6 @@
             )
   )
   
-
-  ; (:action move-left
-  ;   :parameters (?a - agent ?x ?y ?xn - coordinate)
-  ;   :precondition (and
-  ;     (at ?a ?x ?y)
-  ;     (dec ?x ?xn)
-  ;     (not (obstacle ?xn ?y))
-  ;     (not (door-at ?xn ?y))
-  ;   )
-  ;   :effect (and
-  ;     (not (at ?a ?x ?y))
-  ;     (at ?a ?xn ?y)
-  ;   )
-  ; )
-
    (:action right
       :parameters ()
       :precondition (and 
@@ -177,74 +130,4 @@
   )
 
 
-  ; (:action move-right
-  ;   :parameters (?a - agent ?x ?y ?xn - coordinate)
-  ;   :precondition (and
-  ;     (at ?a ?x ?y)
-  ;     (inc ?x ?xn)
-  ;     (not (obstacle ?xn ?y))
-  ;     (not (door-at ?xn ?y))
-  ;   )
-  ;   :effect (and
-  ;     (not (at ?a ?x ?y))
-  ;     (at ?a ?xn ?y)
-  ;   )
-  ; )
-
-  ; Move actions through unlocked doors
-  (:action move-up-through-door
-    :parameters (?a - agent ?x ?y ?yn - coordinate)
-    :precondition (and
-      (at ?a ?x ?y)
-      (dec ?y ?yn)
-      (door-at ?x ?yn)
-      (not (door-locked ?x ?yn))
-    )
-    :effect (and
-      (not (at ?a ?x ?y))
-      (at ?a ?x ?yn)
-    )
-  )
-
-  (:action move-down-through-door
-    :parameters (?a - agent ?x ?y ?yn - coordinate)
-    :precondition (and
-      (at ?a ?x ?y)
-      (inc ?y ?yn)
-      (door-at ?x ?yn)
-      (not (door-locked ?x ?yn))
-    )
-    :effect (and
-      (not (at ?a ?x ?y))
-      (at ?a ?x ?yn)
-    )
-  )
-
-  (:action move-left-through-door
-    :parameters (?a - agent ?x ?y ?xn - coordinate)
-    :precondition (and
-      (at ?a ?x ?y)
-      (dec ?x ?xn)
-      (door-at ?xn ?y)
-      (not (door-locked ?xn ?y))
-    )
-    :effect (and
-      (not (at ?a ?x ?y))
-      (at ?a ?xn ?y)
-    )
-  )
-
-  (:action move-right-through-door
-    :parameters (?a - agent ?x ?y ?xn - coordinate)
-    :precondition (and
-      (at ?a ?x ?y)
-      (inc ?x ?xn)
-      (door-at ?xn ?y)
-      (not (door-locked ?xn ?y))
-    )
-    :effect (and
-      (not (at ?a ?x ?y))
-      (at ?a ?xn ?y)
-    )
-  )
 )

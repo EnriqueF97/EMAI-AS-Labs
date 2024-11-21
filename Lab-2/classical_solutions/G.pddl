@@ -20,7 +20,7 @@
 
     ; Doors (represented by their coordinates)
     (door-at x1 y3)
-    (door-locked x1 y3)
+    ; (door-locked x1 y3)
 
     ; Key-Door Relationships (keys unlock doors at specific coordinates)
     (key-unlocks ka x1 y3)

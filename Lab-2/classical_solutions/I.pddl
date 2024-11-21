@@ -30,9 +30,9 @@
     (door-at x2 y4)
     (door-at x6 y4)
     (door-at x4 y6)
-    (door-locked x2 y4)
-    (door-locked x6 y4)
-    (door-locked x4 y6)
+    ; (door-locked x2 y4)
+    ; (door-locked x6 y4)
+    ; (door-locked x4 y6)
 
     ; Key-Door Relationships
     (key-unlocks kc x2 y4)

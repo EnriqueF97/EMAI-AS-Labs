@@ -25,9 +25,9 @@
     (door-at x1 y2)
     (door-at x1 y4)
     (door-at x3 y5)
-    (door-locked x1 y2)
-    (door-locked x1 y4)
-    (door-locked x3 y5)
+    ; (door-locked x1 y2)
+    ; (door-locked x1 y4)
+    ; (door-locked x3 y5)
 
     ; Key-Door Relationships
     (key-unlocks kc x1 y2)
