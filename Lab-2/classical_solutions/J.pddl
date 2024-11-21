@@ -36,30 +36,30 @@
     (key-at km x1 y10) (key-at kg x3 y10) (key-at ka x7 y10)
     (key-at kb x8 y10) (key-at kh x9 y10)
 
-    ; Doors (represented by their coordinates)
-    (door-at x4 y1) (door-locked x4 y1)    ; dw
-    (door-at x8 y3) (door-locked x8 y3)    ; du
-    (door-at x10 y3) (door-locked x10 y3)  ; dv
-    (door-at x1 y5) (door-locked x1 y5)    ; do
-    (door-at x3 y5) (door-locked x3 y5)    ; dp
-    (door-at x5 y5) (door-locked x5 y5)    ; dq
-    (door-at x6 y5) (door-locked x6 y5)    ; dr
-    (door-at x8 y5) (door-locked x8 y5)    ; ds
-    (door-at x10 y5) (door-locked x10 y5)  ; dt
-    (door-at x1 y7) (door-locked x1 y7)    ; di
-    (door-at x3 y7) (door-locked x3 y7)    ; dj
-    (door-at x5 y7) (door-locked x5 y7)    ; dk
-    (door-at x6 y7) (door-locked x6 y7)    ; dl
-    (door-at x8 y7) (door-locked x8 y7)    ; dm
-    (door-at x10 y7) (door-locked x10 y7)  ; dn
-    (door-at x1 y9) (door-locked x1 y9)    ; dc
-    (door-at x3 y9) (door-locked x3 y9)    ; dd
-    (door-at x5 y9) (door-locked x5 y9)    ; de
-    (door-at x6 y9) (door-locked x6 y9)    ; df
-    (door-at x8 y9) (door-locked x8 y9)    ; dg
-    (door-at x10 y9) (door-locked x10 y9)  ; dh
-    (door-at x2 y10) (door-locked x2 y10)  ; da
-    (door-at x4 y10) (door-locked x4 y10)  ; db
+    ; ; Doors (represented by their coordinates)
+    ; (door-at x4 y1) (door-locked x4 y1)    ; dw
+    ; (door-at x8 y3) (door-locked x8 y3)    ; du
+    ; (door-at x10 y3) (door-locked x10 y3)  ; dv
+    ; (door-at x1 y5) (door-locked x1 y5)    ; do
+    ; (door-at x3 y5) (door-locked x3 y5)    ; dp
+    ; (door-at x5 y5) (door-locked x5 y5)    ; dq
+    ; (door-at x6 y5) (door-locked x6 y5)    ; dr
+    ; (door-at x8 y5) (door-locked x8 y5)    ; ds
+    ; (door-at x10 y5) (door-locked x10 y5)  ; dt
+    ; (door-at x1 y7) (door-locked x1 y7)    ; di
+    ; (door-at x3 y7) (door-locked x3 y7)    ; dj
+    ; (door-at x5 y7) (door-locked x5 y7)    ; dk
+    ; (door-at x6 y7) (door-locked x6 y7)    ; dl
+    ; (door-at x8 y7) (door-locked x8 y7)    ; dm
+    ; (door-at x10 y7) (door-locked x10 y7)  ; dn
+    ; (door-at x1 y9) (door-locked x1 y9)    ; dc
+    ; (door-at x3 y9) (door-locked x3 y9)    ; dd
+    ; (door-at x5 y9) (door-locked x5 y9)    ; de
+    ; (door-at x6 y9) (door-locked x6 y9)    ; df
+    ; (door-at x8 y9) (door-locked x8 y9)    ; dg
+    ; (door-at x10 y9) (door-locked x10 y9)  ; dh
+    ; (door-at x2 y10) (door-locked x2 y10)  ; da
+    ; (door-at x4 y10) (door-locked x4 y10)  ; db
 
     ; Key-Door Relationships
     (key-unlocks kw x4 y1)     ; kw unlocks door at (x4, y1)
