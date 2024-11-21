@@ -1,6 +1,6 @@
 (define (domain maze)
-  (:requirements :strips)
-  (:types agent coordinate)
+  (:requirements :strips :typing :negative-preconditions)
+  (:types agent coordinate typing)
   
   (:predicates 
     (inc ?a ?b - coordinate)        ; Increment relationship between coordinates
