@@ -1,0 +1,3 @@
+[submodule "Pacman-Contest/pacman-agent/pacman-contest"]
+	path = Pacman-Contest/pacman-agent/pacman-contest
+	url = git@github.com:aig-upf/pacman-agent.git
