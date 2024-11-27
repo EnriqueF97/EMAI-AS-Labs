@@ -12,6 +12,7 @@ import contest.util as util
 from contest.capture_agents import CaptureAgent
 from contest.game import Directions
 from contest.util import nearest_point
+from contest.distance_calculator import Distancer
 
 
 #################
@@ -55,6 +56,104 @@ class OffensiveAStarAgent(CaptureAgent):
         self.start = game_state.get_agent_position(self.index)
         CaptureAgent.register_initial_state(self, game_state)
 
+    def check_scared_ghosts(self, game_state):
+        """
+        Check if any enemy ghost is scared and return a list of scared ghosts positions with their scared timer.
+        """
+        opponents = self.get_opponents(game_state)
+        my_pos = game_state.get_agent_state(self.index).get_position()
+        scared_ghosts = []
+
+        for opponent_index in opponents:
+            enemy_state = game_state.get_agent_state(opponent_index)
+            if not enemy_state.is_pacman:  # Ensure it's a ghost
+                if enemy_state.scared_timer > 0:  # Check if scared
+                    scared_ghosts.append((opponent_index, enemy_state.get_position(), enemy_state.scared_timer))
+        
+        # Filter out ghosts that are not visible (position is None)
+        visible_ghosts = [(index, pos, timer) for index, pos, timer in scared_ghosts if pos is not None]
+
+        if not visible_ghosts:
+            return None  # No visible ghosts to consider
+
+        # Find the closest ghost based on maze distance
+        closest_ghost = min(
+            visible_ghosts,
+            key=lambda ghost: self.get_maze_distance(my_pos, ghost[1])  # Distance to the ghost's position
+            )
+        return closest_ghost
+
+    def enemy_distance(self,game_state):
+        distancer = Distancer(game_state.data.layout)
+        my_position = game_state.get_agent_state(self.index).get_position()
+        opponents = self.get_opponents(game_state)
+        
+        distance = []
+        for index in opponents:
+            enemy_position = game_state.get_agent_position(index)
+            if enemy_position == None:
+                distance.append(1000)
+            else:
+                distance.append(distancer.get_distance(enemy_position, my_position ))
+        # print("Distance",distance)
+        return(min(distance))   
+    
+    def enemy_position(self,game_state):
+        enemy_position = []
+        opponents = self.get_opponents(game_state)
+        
+        for index in opponents:
+            enemy_position.append(game_state.get_agent_position(index))
+
+        # print(enemy_position)
+        return(enemy_position)   
+        
+    def choose_action(self, game_state):
+            """
+            Choose Offensive action using A* to navigate to the nearest food.
+            """
+            my_pos = game_state.get_agent_state(self.index).get_position()
+            pacman_state = game_state.get_agent_state(self.index).is_pacman
+            e_dist = self.enemy_distance(game_state)
+            food_list = self.get_food(game_state).as_list()
+                            # If there is no food left, stop
+            if not food_list:
+                return Directions.STOP
+            
+            if pacman_state: # If we are Pacman MODE
+                
+                closest_ghost = self.check_scared_ghosts(game_state) # Check if ghost are scared
+
+                if closest_ghost:
+                    goal = closest_ghost[1]
+                    print("closest ghost",closest_ghost)
+
+                elif e_dist < 4 or not food_list: # If we are being chased or we are done eating we go back to the base
+                    goal = game_state.get_initial_agent_position(self.index)
+                    # print("ENEMY NEAR", e_dist)
+                else:
+                    # print("Offensive mode on")
+                    goal = min(food_list, key=lambda food: self.get_maze_distance(my_pos, food)) #Nearest Food
+            else:
+                goal = min(food_list, key=lambda food: self.get_maze_distance(my_pos, food)) # Nearest Food
+
+
+
+
+            path = self.a_star_search(game_state, my_pos, goal)
+
+            # Return the first step of the path, if it exists
+            if path and len(path) > 0:
+                # print("First step of path", path)
+                return path[0]
+            else:
+                goal = game_state.get_initial_agent_position(self.index)
+                path = self.a_star_search(game_state, my_pos, goal)
+                
+                return path[0]
+
+
+
     def a_star_search(self,initial_game_state, start, goal):
         """Search the node that has the lowest combined cost and heuristic first."""
 
@@ -64,13 +163,9 @@ class OffensiveAStarAgent(CaptureAgent):
         cost_so_far = {start: 0}  # Dictionary to track the minimum cost to reach each state
 
         while not frontier.is_empty():            
-            # print("Enter While")
             current_game_state, current_pos, path = frontier.pop() # Pop the node with the lowest path cost
-            # print("Current Path", path)
             # Goal test after popping the node
             if current_pos == goal:  
-                # print("SOLVED RETURN:", path)
-                # return []
                 return path  # Return the solution path if goal is found
 
             if current_pos in expanded_nodes:
@@ -80,7 +175,6 @@ class OffensiveAStarAgent(CaptureAgent):
 
             # Expand neighbors, looking at actions
             for action in current_game_state.get_legal_actions(self.index):
-                # print("Current Action: ", action)
                 # Ignore STOP action
                 if action == Directions.STOP:
                     continue
@@ -88,54 +182,26 @@ class OffensiveAStarAgent(CaptureAgent):
                 successor = current_game_state.generate_successor(self.index, action) #Returns the successor state (a GameState object) after the specified agent takes the action.
                 next_pos = successor.get_agent_state(self.index).get_position() #Returns the position of agent after taken the current action
                 next_pos = nearest_point(next_pos)
-                # print("Next position", next_pos)
-                # print("Nearest", nearest_point(next_pos))
-                # print(next_pos != nearest_point(next_pos))
-                # print("cost_so_far:", cost_so_far)
-                
-                
-                # Skip invalid positions or half-grid positions
-                # if next_pos not in cost_so_far or next_pos != nearest_point(next_pos):
-                    # continue
 
                 # Compute costs
                 new_cost = cost_so_far[current_pos] + 1  # Cost to move is constant
-                # print("New Cost: ", new_cost)
-                # print("cost_so_far[next_pos]:", cost_so_far[next_pos])
                 # If next_pos has not been expanded, or if a cheaper path to it is found
                 if next_pos not in expanded_nodes or new_cost < cost_so_far[next_pos]:
-
-                    # print("Enter the void")
                     cost_so_far[next_pos] = new_cost
                     new_path = path + [action]
 
                     # Priority is based on f(n) = g(n) + h(n)
                     h = self.get_maze_distance(next_pos, goal)  # Heuristic (Manhattan distance)
-                    f = new_cost + h   
+                    # d = self.enemy_distance(successor)
+                    # if d == 0 : d =1
+                    # f = new_cost + h + 100/d
+                    f = new_cost + h 
                     # print("New Path: ", new_path) 
                     frontier.push((successor,next_pos, new_path), f)
+                    
 
     
-    def choose_action(self, game_state):
-        """
-        Choose an action using A* to navigate to the nearest food.
-        """
-        my_pos = game_state.get_agent_state(self.index).get_position()
-        food_list = self.get_food(game_state).as_list()
-        # If there is no food left, stop
-        if not food_list:
-            return Directions.STOP
-        
-        goal = min(food_list, key=lambda food: self.get_maze_distance(my_pos, food))
-        path = self.a_star_search(game_state, my_pos, goal)
- 
-        # Return the first step of the path, if it exists
-        if path and len(path) > 0:
-            # print("First step of path", path)
-            return path[0]
-        else:
-            return Directions.STOP
-
+   
 ##########
 # Agents #
 ##########
@@ -243,6 +309,8 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
 
     def get_weights(self, game_state, action):
         return {'successor_score': 100, 'distance_to_food': -1}
+    
+
 
 
 class DefensiveReflexAgent(ReflexCaptureAgent):
