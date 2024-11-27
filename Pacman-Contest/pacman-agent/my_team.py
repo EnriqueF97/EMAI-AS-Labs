@@ -19,7 +19,7 @@ from contest.util import nearest_point
 #################
 
 def create_team(first_index, second_index, is_red,
-                first='OffensiveReflexAgent', second='DefensiveReflexAgent', num_training=0):
+                first='OffensiveAStarAgent', second='DefensiveReflexAgent', num_training=0):
     """
     This function should return a list of two agents that will form the
     team, initialized using firstIndex and secondIndex as their agent
@@ -36,6 +36,105 @@ def create_team(first_index, second_index, is_red,
     """
     return [eval(first)(first_index), eval(second)(second_index)]
 
+
+
+#############
+# My Agents #
+#############
+
+class OffensiveAStarAgent(CaptureAgent):
+    """
+        Uses A Star to look for the food.
+    """
+
+    def __init__(self, index, time_for_computing=.1):
+        super().__init__(index, time_for_computing)
+        self.start = None
+
+    def register_initial_state(self, game_state):
+        self.start = game_state.get_agent_position(self.index)
+        CaptureAgent.register_initial_state(self, game_state)
+
+    def a_star_search(self,initial_game_state, start, goal):
+        """Search the node that has the lowest combined cost and heuristic first."""
+
+        expanded_nodes = set()  # Expanded nodes initialized as an empty set
+        frontier = util.PriorityQueue()  # Frontier as a PriorityQueue
+        frontier.push((initial_game_state,start, []), 0)  # Frontier initialized with the initial state
+        cost_so_far = {start: 0}  # Dictionary to track the minimum cost to reach each state
+
+        while not frontier.is_empty():            
+            # print("Enter While")
+            current_game_state, current_pos, path = frontier.pop() # Pop the node with the lowest path cost
+            # print("Current Path", path)
+            # Goal test after popping the node
+            if current_pos == goal:  
+                # print("SOLVED RETURN:", path)
+                # return []
+                return path  # Return the solution path if goal is found
+
+            if current_pos in expanded_nodes:
+                continue  # Skip already expanded nodes
+            else: 
+                expanded_nodes.add(current_pos) # Mark node as expanded
+
+            # Expand neighbors, looking at actions
+            for action in current_game_state.get_legal_actions(self.index):
+                # print("Current Action: ", action)
+                # Ignore STOP action
+                if action == Directions.STOP:
+                    continue
+                 # Get successor state and position
+                successor = current_game_state.generate_successor(self.index, action) #Returns the successor state (a GameState object) after the specified agent takes the action.
+                next_pos = successor.get_agent_state(self.index).get_position() #Returns the position of agent after taken the current action
+                next_pos = nearest_point(next_pos)
+                # print("Next position", next_pos)
+                # print("Nearest", nearest_point(next_pos))
+                # print(next_pos != nearest_point(next_pos))
+                # print("cost_so_far:", cost_so_far)
+                
+                
+                # Skip invalid positions or half-grid positions
+                # if next_pos not in cost_so_far or next_pos != nearest_point(next_pos):
+                    # continue
+
+                # Compute costs
+                new_cost = cost_so_far[current_pos] + 1  # Cost to move is constant
+                # print("New Cost: ", new_cost)
+                # print("cost_so_far[next_pos]:", cost_so_far[next_pos])
+                # If next_pos has not been expanded, or if a cheaper path to it is found
+                if next_pos not in expanded_nodes or new_cost < cost_so_far[next_pos]:
+
+                    # print("Enter the void")
+                    cost_so_far[next_pos] = new_cost
+                    new_path = path + [action]
+
+                    # Priority is based on f(n) = g(n) + h(n)
+                    h = self.get_maze_distance(next_pos, goal)  # Heuristic (Manhattan distance)
+                    f = new_cost + h   
+                    # print("New Path: ", new_path) 
+                    frontier.push((successor,next_pos, new_path), f)
+
+    
+    def choose_action(self, game_state):
+        """
+        Choose an action using A* to navigate to the nearest food.
+        """
+        my_pos = game_state.get_agent_state(self.index).get_position()
+        food_list = self.get_food(game_state).as_list()
+        # If there is no food left, stop
+        if not food_list:
+            return Directions.STOP
+        
+        goal = min(food_list, key=lambda food: self.get_maze_distance(my_pos, food))
+        path = self.a_star_search(game_state, my_pos, goal)
+ 
+        # Return the first step of the path, if it exists
+        if path and len(path) > 0:
+            # print("First step of path", path)
+            return path[0]
+        else:
+            return Directions.STOP
 
 ##########
 # Agents #
@@ -181,3 +280,5 @@ class DefensiveReflexAgent(ReflexCaptureAgent):
 
     def get_weights(self, game_state, action):
         return {'num_invaders': -1000, 'on_defense': 100, 'invader_distance': -10, 'stop': -100, 'reverse': -2}
+
+
