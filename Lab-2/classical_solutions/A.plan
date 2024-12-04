@@ -1,0 +1,14 @@
+;;!domain: maze-key
+;;!problem: maze-A
+
+0.00000: (up)
+0.00100: (left)
+0.00200: (up)
+0.00300: (left)
+0.00400: (up)
+0.00500: (left)
+0.00600: (up)
+0.00700: (left)
+
+; Makespan: 0.007
+; Metric: 0.007

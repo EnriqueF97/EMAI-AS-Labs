@@ -1,0 +1,20 @@
+;;!domain: maze-key
+;;!problem: maze-G
+
+0.00000: (up)
+0.00100: (up)
+0.00200: (up)
+0.00300: (pickup ag ka x4 y1)
+0.00400: (down)
+0.00500: (down)
+0.00600: (down)
+0.00700: (left)
+0.00800: (left)
+0.00900: (left)
+0.01000: (unlock ag ka x1 y4 x1 y3)
+0.01100: (up)
+0.01200: (up)
+0.01300: (up)
+
+; Makespan: 0.013000000000000005
+; Metric: 0.013000000000000005
