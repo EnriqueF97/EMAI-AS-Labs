@@ -130,10 +130,12 @@ class OffensiveAStarAgent(CaptureAgent):
                 
                 elif e_dist < 4 : # If we are being chased or we are done eating we go back to the base
                     capsules = self.get_capsules(game_state)
-                    print(capsules)
+                    # print(capsules)
+                    # print(len(capsules))
                     if len(capsules)>0:
                         # goal = min(capsules, key=lambda cap: self.get_maze_distance(my_pos, cap)) #Neares Capsule
-                        goal = capsules
+                        goal = capsules[0]
+                        
             
                 else:
                     # print("Offensive mode on")
