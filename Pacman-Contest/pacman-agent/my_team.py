@@ -92,7 +92,7 @@ class OffensiveAStarAgent(CaptureAgent):
         for index in opponents:
             enemy_position = game_state.get_agent_position(index)
             if enemy_position == None:
-                distance.append(1000)
+                distance.append(100)
             else:
                 distance.append(distancer.get_distance(enemy_position, my_position ))
         # print("Distance",distance)
@@ -116,45 +116,51 @@ class OffensiveAStarAgent(CaptureAgent):
             pacman_state = game_state.get_agent_state(self.index).is_pacman
             e_dist = self.enemy_distance(game_state)
             food_list = self.get_food(game_state).as_list()
-                            # If there is no food left, stop
-            if not food_list:
-                return Directions.STOP
-            
+            closest_ghost = self.check_scared_ghosts(game_state) # Check if ghost are scared
+            goal = min(food_list, key=lambda food: self.get_maze_distance(my_pos, food)) #Nearest Food
+
             if pacman_state: # If we are Pacman MODE
+                heuristic = 10/self.enemy_distance(game_state)
+                if not food_list: # If we are done eating we go back to base.
+                     goal = game_state.get_initial_agent_position(self.index)          
                 
-                closest_ghost = self.check_scared_ghosts(game_state) # Check if ghost are scared
-
-                if closest_ghost:
+                elif closest_ghost:
                     goal = closest_ghost[1]
-                    print("closest ghost",closest_ghost)
 
-                elif e_dist < 4 or not food_list: # If we are being chased or we are done eating we go back to the base
-                    goal = game_state.get_initial_agent_position(self.index)
-                    # print("ENEMY NEAR", e_dist)
+                
+                elif e_dist < 4 : # If we are being chased or we are done eating we go back to the base
+                    capsules = self.get_capsules(game_state)
+                    print(capsules)
+                    if len(capsules)>0:
+                        # goal = min(capsules, key=lambda cap: self.get_maze_distance(my_pos, cap)) #Neares Capsule
+                        goal = capsules
+            
                 else:
                     # print("Offensive mode on")
                     goal = min(food_list, key=lambda food: self.get_maze_distance(my_pos, food)) #Nearest Food
-            else:
+            
+            else: #Ghost mode
                 goal = min(food_list, key=lambda food: self.get_maze_distance(my_pos, food)) # Nearest Food
+                heuristic = self.enemy_distance(game_state)
 
 
-
-
-            path = self.a_star_search(game_state, my_pos, goal)
+            # print("GOAL:",goal )
+            path = self.a_star_search(game_state, my_pos, goal, heuristic)
 
             # Return the first step of the path, if it exists
             if path and len(path) > 0:
                 # print("First step of path", path)
                 return path[0]
             else:
+                #If something weird is happening jus go home
                 goal = game_state.get_initial_agent_position(self.index)
-                path = self.a_star_search(game_state, my_pos, goal)
+                path = self.a_star_search(game_state, my_pos, goal, heuristic)
                 
                 return path[0]
 
 
 
-    def a_star_search(self,initial_game_state, start, goal):
+    def a_star_search(self,initial_game_state, start, goal, heuristic):
         """Search the node that has the lowest combined cost and heuristic first."""
 
         expanded_nodes = set()  # Expanded nodes initialized as an empty set
@@ -195,7 +201,7 @@ class OffensiveAStarAgent(CaptureAgent):
                     # d = self.enemy_distance(successor)
                     # if d == 0 : d =1
                     # f = new_cost + h + 100/d
-                    f = new_cost + h 
+                    f = new_cost + h + heuristic
                     # print("New Path: ", new_path) 
                     frontier.push((successor,next_pos, new_path), f)
                     
