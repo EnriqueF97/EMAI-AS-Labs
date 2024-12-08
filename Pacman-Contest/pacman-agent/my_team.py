@@ -118,6 +118,7 @@ class OffensiveAStarAgent(CaptureAgent):
         2. If a scared ghost is present, target it.
         3. If too close to enemies, seek a capsule if available or return home if not.
         4. Otherwise, target the nearest food.
+        5. If pacman is carrying 5 foods, return home.
 
         Returns:
             tuple (x, y): coordinates of the chosen goal.
@@ -127,6 +128,7 @@ class OffensiveAStarAgent(CaptureAgent):
         available_food = self.get_food(game_state).as_list()
         closest_scared_ghost = self.get_closest_scared_ghost(game_state)
         closest_enemy_distance = self.get_closest_enemy_distance(game_state)
+        numFoodCarrying = game_state.get_agent_state(self.index).num_carrying
 
         # If no food is available, go home
         if not available_food:
@@ -148,6 +150,10 @@ class OffensiveAStarAgent(CaptureAgent):
                 else:
                     # No capsules, retreat home
                     return game_state.get_initial_agent_position(self.index)
+
+            # If agent is carrying 5 foods
+            if numFoodCarrying >= 5:
+                return game_state.get_initial_agent_position(self.index)
 
             # Default: choose the nearest food if no other conditions triggered
             return min(available_food, key=lambda food: self.get_maze_distance(my_pos, food))
@@ -338,6 +344,23 @@ class DefensiveAStarAgent(CaptureAgent):
         st = game_state.get_agent_state(self.index)
         return st.scared_timer > 0 and not st.is_pacman
 
+    def find_valid_patrol_point(self, game_state):
+        """
+        Dynamically find a valid patrol point near the map's middle boundary.
+        Ensures the patrol point isn't blocked by walls.
+        """
+        height = game_state.data.layout.height
+        points = []
+
+        # Search along the middle column (or columns, based on the team's side)
+        for y in range(height):
+            patrol_x = self.mid_x - (1 if self.is_red else 0)
+            if not game_state.has_wall(patrol_x, y):
+                points.append((patrol_x, y))
+
+        # Return the middle patrol point or fallback to the start position
+        return points[len(points) // 2] if points else self.start_position
+
     def select_goal(self, game_state):
         # Decide the goal based on current conditions:
         # Scared -> start position.
@@ -351,6 +374,9 @@ class DefensiveAStarAgent(CaptureAgent):
         if inv:
             my_pos = self.get_current_position(game_state)
             return min((p for _, p in inv), key=lambda p: self.get_maze_distance(my_pos, p))
+        if not self.patrol_point or game_state.has_wall(*self.patrol_point):
+            self.patrol_point = self.find_valid_patrol_point(game_state)
+
         return self.patrol_point
 
     def calculate_heuristic(self, game_state, cpos, gpos):
