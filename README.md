@@ -9,10 +9,10 @@
 
 This project is a submission for the Pacman Capture the Flag contest, originally created by UC Berkeley as part of their CS188 Artificial Intelligence course. The contest challenges participants to design intelligent agents that compete in a team-based, capture-the-flag variant of Pacman, where agents must balance offensive and defensive strategies. The codebase and contest framework are adapted from the official UC Berkeley Pacman AI projects, and this submission implements custom agent strategies using A* search for both offensive and defensive roles.
 
+### Our approach made it into the top 10 teams, among more than 60 teams of AI Bachelor and Master students from around the world. 
+**Scores:**
 https://pacman-contest.upf.edu/final_UL_24-25/results_0.html 
 
-
-Our implementation ranked 10th out of 63 contestants in the final round.
 
 
 ## PacMan Capture the Flag - Offensive and Defensive Agents
@@ -78,7 +78,7 @@ The `select_goal` method determines the agent's next goal based on these priorit
 
 - **If scared, go hide:** If the defensive ghost is scared, it tries to avoid the enemy Pacman.
 - **If enemy invader, chase it:** If an enemy Pacman is detected in its territory, the agent chases it to force it back to base.
-- **Patrol to midpoint:** Otherwise, the agent patrols the midpoint of its territory to intercept invaders efficiently.
+- **Patrol to midpoint:** Otherwise, the agent patrols the midpoint of its territory to intercept invaders efficiently. This approach intercepts the opponent's pac-man as soon as it enters our field.
 
 ### 3. Patrol Point Selection
 
@@ -107,6 +107,6 @@ The `DefensiveAStarAgent` prioritizes:
 - **Invader:** Chase the closest invader.
 - **Patrol:** Move toward the patrol point if there are no immediate threats.
 
-The agent uses A* search to efficiently reach these goals while considering obstacles and enemies.
+The agent uses A* search to efficiently reach these goals while considering obstacles and enemies. What we accomplished with this strategy was a sharp defense, as our defensive ghost was already on the entrance of our side court, when the opponent offensive pacman enters, resulting on our defensor eating the offensive pacman. 
 
 ---
